@@ -29,9 +29,9 @@ class Jackett(_PluginBase):
     plugin_name = "Jackett"
     plugin_desc = "通过 Jackett (Torznab) 接入第三方索引器（1337x/RARBG/nyaa 等）。"
     plugin_icon = "https://raw.githubusercontent.com/Jackett/Jackett/master/src/Jackett.Common/Content/favicon.ico"
-    plugin_version = "1.0.0"
-    plugin_author = "claude"
-    author_url = ""
+    plugin_version = "1.1.0"
+    plugin_author = "lyj324"
+    author_url = "https://github.com/lyj324"
     plugin_config_prefix = "jackett_"
     plugin_order = 21
     auth_level = 2

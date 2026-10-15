@@ -35,4 +35,5 @@ MP v3.0.10 引入了 ModuleMethodContract 注册机制——dispatcher 只调用
 
 - 用 `app.adapters.network.http.AsyncRequestUtils` 走 v3 自带的异步 HTTP 客户端（自动代理配置）
 - 现代 Jackett (>= 0.22) 即使 AdminPassword 为空也要求 session cookie → 插件会 POST `/UI/Dashboard` 拿 cookie 再带 cookie 调 `/api/v2.0/indexers`，避免 302 → /UI/Login
-- 响应是 HTML / 空 / DTD 都做了安全过滤；Torznab XML 用 stdlib `xml.etree.ElementTree`，5 MB 响应上限防恶意载荷
+- 响应是 HTML / 空 / DTD 都做了安全过滤；Torznab XML 用 `defusedxml.ElementTree`（防 XXE / billion-laughs），5 MB 响应上限防恶意载荷
+- 关键日志里只打 URL path，避免 apikey 泄露到日志文件
