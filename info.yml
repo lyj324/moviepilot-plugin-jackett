@@ -1,0 +1,12 @@
+# MoviePilot v3 插件元数据
+plugin_name: Jackett
+plugin_id: jackett
+plugin_version: 1.1.0
+plugin_desc: 通过 Jackett (Torznab) 接入第三方索引器（1337x / RARBG / nyaa 等）。基于 MP 官方 jackett 插件修补，补上 v3 dispatcher 必需的 get_module() 注册方法。
+plugin_author: lyj324
+author_url: https://github.com/lyj324
+plugin_icon: https://raw.githubusercontent.com/Jackett/Jackett/master/src/Jackett.Common/Content/favicon.ico
+plugin_config_prefix: jackett_
+plugin_order: 21
+auth_level: 2
+# 历史：1.0.0 = 初版，含 get_module() 补丁；1.1.0 = 元数据整理，准备推到 GitHub 走插件市场重装

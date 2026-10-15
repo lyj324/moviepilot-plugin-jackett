@@ -1,0 +1,1 @@
+# 仅依赖 MoviePilot v3 自带的 stdlib + app.adapters.network.http.AsyncRequestUtils，无第三方 pip 包

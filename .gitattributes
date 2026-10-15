@@ -1,0 +1,11 @@
+# Auto-detect text files, force LF line endings on commit
+* text=auto eol=lf
+
+# Python source: ensure LF
+*.py text eol=lf
+
+# YAML / markdown / config
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
