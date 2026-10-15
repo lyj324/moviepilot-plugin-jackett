@@ -8,12 +8,30 @@ MP v3.0.10 引入了 ModuleMethodContract 注册机制——dispatcher 只调用
 
 本仓库的修复：补一个 `get_module()`，把它声明的两个钩子交给 dispatcher。
 
+## 仓库结构（对齐 MP 官方插件仓库格式）
+
+```
+moviepilot-plugin-jackett/
+├── package.v3.json             ← MP 解析这个 JSON 来枚举插件
+├── plugins.v3/                 ← 所有 v3 插件目录
+│   └── jackett/                ← plugin_id = jackett（小写）
+│       ├── __init__.py         ← 插件代码
+│       └── requirements.txt      ← 依赖（defusedxml）
+├── README.md
+├── .gitattributes
+└── .gitignore
+```
+
+`package.v3.json` 是关键——MP v3 通过它发现哪些插件可用，没有它仓库会被识别成"未绑定"。
+
 ## 安装
 
-**从 Git 安装**（MP Web UI）：
-1. 进 MP 后台 → 插件 → 从 Git 安装
-3. 仓库 URL 填：`https://github.com/lyj324/moviepilot-plugin-jackett`
-3. 装完在"已安装插件"里能看到 Jackett 1.1.0
+**插件仓库**（MP Web UI）：
+
+1. MP 后台 → 插件 → **插件仓库** → 添加 `https://github.com/lyj324/moviepilot-plugin-jackett`
+2. 同步仓库列表
+3. 在列表里找到 Jackett 1.1.0，点安装
+4. 已安装插件里：版本 `v1.1.0`、作者 `lyj324`、**来源**不再是"未绑定"
 
 ## 配置
 
