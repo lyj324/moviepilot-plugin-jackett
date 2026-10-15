@@ -8,9 +8,10 @@ from __future__ import annotations
 import asyncio
 import re
 import time
-import xml.etree.ElementTree as ET
 from typing import Any, Dict, List, Optional
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
+
+import defusedxml.ElementTree as ET
 
 from app.domain.context import MediaType, TorrentInfo
 from app.plugins import _PluginBase
@@ -298,6 +299,8 @@ class Jackett(_PluginBase):
         if cat:
             params["cat"] = cat
         url = f"{self._host}/api/v2.0/indexers/{indexer_id}/results/torznab/api?{urlencode(params)}"
+        # 日志路径用 path-only，不带 apikey query string，避免凭证泄漏到日志
+        url_path = urlsplit(url).path
         try:
             xml_text = await self._http_get_text(url)
         except Exception as err:
@@ -328,8 +331,9 @@ class Jackett(_PluginBase):
                 location = response.headers.get("Location", "")
             except Exception:
                 pass
+            # 只记 path 和 Location 头，绝不带 apikey query string
             logger.warn(
-                f"Jackett: GET {url} 返回 302, Location={location!r}, "
+                f"Jackett: GET {url_path} 返回 302, Location={location!r}, "
                 f"当前 cookie keys={list(self._session_cookies.keys()) if self._session_cookies else []}"
             )
             if "/UI/Login" in location:
@@ -388,9 +392,11 @@ def _parse_size(size_str: str) -> float:
 def _parse_torznab(xml_text: str, indexer_id: str) -> List[TorrentInfo]:
     if not xml_text:
         return []
-    # Defensive: reject input that looks like it tries to abuse XML parsing.
-    # Python's stdlib xml.etree.ElementTree (3.7.1+) doesn't resolve external
-    # entities by default, but we still reject DTD directives and cap the size.
+    # Defensive: defusedxml raises on DTD/entity declarations, and Python's
+    # stdlib ET (3.7.1+) already disables external entity resolution by
+    # default — belt-and-suspenders. We still cap the size and reject raw
+    # "<!doctype" / "<!entity" markers as an extra guard against encoded
+    # payloads that try to sneak past defusedxml's parser.
     if len(xml_text) > 5_000_000:  # 5 MB sanity cap
         logger.warn(f"Jackett [{indexer_id}] 响应过大（{len(xml_text)}B），跳过")
         return []
@@ -400,7 +406,8 @@ def _parse_torznab(xml_text: str, indexer_id: str) -> List[TorrentInfo]:
         return []
     try:
         root = ET.fromstring(xml_text)
-    except ET.ParseError as err:
+    except (ET.ParseError, ValueError) as err:
+        # defusedxml raises ValueError on DTD/entity; stdlib raises ParseError
         logger.warn(f"Jackett [{indexer_id}] XML 解析失败：{err}")
         return []
     if root.tag != "rss":
